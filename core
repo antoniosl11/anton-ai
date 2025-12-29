@@ -1,0 +1,37 @@
+from flask import Flask, render_template, request, jsonify
+import random
+
+app = Flask(__name__)
+
+respostas = [
+    "Matemática é treino. Um passo por vez.",
+    "Errar faz parte. Persistir é obrigatório.",
+    "Ciência começa com curiosidade.",
+    "Tecnologia é ferramenta, não milagre.",
+    "Você está aprendendo mais do que imagina.",
+    "Relaxa. Se parece difícil, é porque vale a pena."
+]
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.json
+    pergunta = data.get("mensagem", "").lower()
+
+    if "matem" in pergunta:
+        resposta = "Matemática não é decorar. É entender o jogo."
+    elif "ia" in pergunta:
+        resposta = "IA não substitui quem pensa. Substitui quem repete."
+    elif "estudar" in pergunta:
+        resposta = "Pouco todo dia vence muito de vez em quando."
+    else:
+        resposta = random.choice(respostas)
+
+    return jsonify({"resposta": resposta})
+
+if __name__ == "__main__":
+    # host=0.0.0.0 permite acesso pela rede
+    app.run(host="0.0.0.0", port=5000, debug=True)
