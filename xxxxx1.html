@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ANTON | AI Mentor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #0a1a2f, #000);
+  color: #e6f6ff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  height: 95vh;
+  background: rgba(5,15,30,0.95);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,180,255,0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  padding: 14px;
+  text-align: center;
+  background: linear-gradient(90deg,#001f3f,#003f7f);
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+header span {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+
+.avatar img {
+  width: 110px;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #00c6ff;
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 10px #00c6ff; }
+  50% { box-shadow: 0 0 30px #00c6ff; }
+  100% { box-shadow: 0 0 10px #00c6ff; }
+}
+
+.tabs {
+  display: flex;
+  background: #020912;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: #7fdfff;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #003f7f;
+  color: #fff;
+}
+
+.section {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+}
+
+.section.active {
+  display: flex;
+}
+
+/* CHAT */
+#chat {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.msg {
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  max-width: 80%;
+  font-size: 14px;
+}
+
+.user {
+  background: #0072ff;
+  margin-left: auto;
+}
+
+.bot {
+  background: #0f253a;
+}
+
+.chat-footer {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+
+.chat-footer button {
+  padding: 12px 16px;
+  border-radius: 50%;
+  border: none;
+  background: #00c6ff;
+  cursor: pointer;
+}
+
+/* CALCULADORA */
+.calc {
+  padding: 15px;
+}
+
+.calc-display {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.calc-grid button {
+  padding: 15px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  background: #003f7f;
+  color: #fff;
+  cursor: pointer;
+}
+
+.calc-grid button.op {
+  background: #0072ff;
+}
+
+.calc-grid button.clear {
+  background: #a30000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  ANTON | AI Mentor<br>
+  <span>Aprenda. Evolua. Domine.</span>
+</header>
+
+<div class="avatar">
+  <img src="anton.png" alt="ANTON">
+</div>
+
+<div class="tabs">
+  <button class="active" onclick="trocar('chat')">Chat</button>
+  <button onclick="trocar('calc')">Calculadora</button>
+</div>
+
+<!-- CHAT -->
+<div id="chatSection" class="section active">
+  <div id="chat"></div>
+  <div class="chat-footer">
+    <input id="input" placeholder="Pergunte algo ao ANTON..." />
+    <button onclick="enviar()">➤</button>
+  </div>
+</div>
+
+<!-- CALCULADORA -->
+<div id="calcSection" class="section">
+  <div class="calc">
+    <input id="display" class="calc-display" disabled>
+
+    <div class="calc-grid">
+      <button onclick="add('7')">7</button>
+      <button onclick="add('8')">8</button>
+      <button onclick="add('9')">9</button>
+      <button class="op" onclick="add('/')">÷</button>
+
+      <button onclick="add('4')">4</button>
+      <button onclick="add('5')">5</button>
+      <button onclick="add('6')">6</button>
+      <button class="op" onclick="add('*')">×</button>
+
+      <button onclick="add('1')">1</button>
+      <button onclick="add('2')">2</button>
+      <button onclick="add('3')">3</button>
+      <button class="op" onclick="add('-')">−</button>
+
+      <button onclick="add('0')">0</button>
+      <button onclick="add('.')">.</button>
+      <button onclick="calcular()">=</button>
+      <button class="op" onclick="add('+')">+</button>
+
+      <button class="clear" onclick="limpar()">C</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* TABS */
+function trocar(sec) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+
+  if (sec === 'chat') {
+    document.querySelectorAll(".tabs button")[0].classList.add("active");
+    chatSection.classList.add("active");
+  } else {
+    document.querySelectorAll(".tabs button")[1].classList.add("active");
+    calcSection.classList.add("active");
+  }
+}
+
+/* CHAT */
+const chat = document.getElementById("chat");
+
+const respostas = [
+  "Matemática é treino. Um passo por vez.",
+  "Errar faz parte. Persistir é obrigatório.",
+  "Ciência começa com curiosidade.",
+  "Tecnologia é ferramenta, não milagre.",
+  "Você está aprendendo mais do que imagina."
+];
+
+function enviar() {
+  const input = document.getElementById("input");
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  addMsg(texto, "user");
+  input.value = "";
+
+  setTimeout(() => {
+    const r = respostas[Math.floor(Math.random() * respostas.length)];
+    addMsg(r, "bot");
+    falar(r);
+  }, 600);
+}
+
+function addMsg(txt, tipo) {
+  const div = document.createElement("div");
+  div.className = "msg " + tipo;
+  div.innerText = txt;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function falar(txt) {
+  if (!("speechSynthesis" in window)) return;
+  const voz = new SpeechSynthesisUtterance(txt);
+  voz.lang = "pt-BR";
+  speechSynthesis.speak(voz);
+}
+
+/* CALCULADORA */
+const display = document.getElementById("display");
+
+function add(v) {
+  display.value += v;
+}
+
+function limpar() {
+  display.value = "";
+}
+
+function calcular() {
+  try {
+    display.value = eval(display.value);
+  } catch {
+    display.value = "Erro";
+  }
+}
+</script>
+
+</body>
+</html>
